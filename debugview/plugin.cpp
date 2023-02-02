@@ -31,6 +31,22 @@ using namespace ILLIXR;
 constexpr size_t TEST_PATTERN_WIDTH  = 256;
 constexpr size_t TEST_PATTERN_HEIGHT = 256;
 
+
+const record_header pose_record{"pose_record",
+                                {
+                                    {"iternation_no", typeid(std::size_t)},
+                                    {"fast_pose_x", typeid(double)},
+                                    {"fast_pose_y", typeid(double)},
+                                    {"fast_pose_z", typeid(double)},
+                               }};
+const record_header ground_truth_record{"ground_truth_record",
+                                {
+                                    {"iteration_no", typeid(std::size_t)},
+                                    {"ground_truth_x", typeid(double)},
+                                    {"ground_truth_y", typeid(double)},
+                                    {"ground_truth_z", typeid(double)},
+                                }};
+
 // Loosely inspired by
 // http://spointeau.blogspot.com/2013/12/hello-i-am-looking-at-opengl-3.html
 
@@ -68,7 +84,9 @@ public:
         , pp{pb->lookup_impl<pose_prediction>()}
         , _m_slow_pose{sb->get_reader<pose_type>("slow_pose")}
         , _m_fast_pose{sb->get_reader<imu_raw_type>("imu_raw")} //, glfw_context{pb->lookup_impl<global_config>()->glfw_context}
-        , _m_cam{sb->get_buffered_reader<cam_type>("cam")} { }
+        , _m_cam{sb->get_buffered_reader<cam_type>("cam")}
+        , dbg_logger{record_logger_}
+        , gt_logger{record_logger_} { }
 
     void draw_GUI() {
         RAC_ERRNO_MSG("debugview at start of draw_GUI");
@@ -149,6 +167,13 @@ public:
                         swapped_pose.position.z());
             ImGui::Text("Fast pose quaternion (XYZW):\n  (%f, %f, %f, %f)", swapped_pose.orientation.x(),
                         swapped_pose.orientation.y(), swapped_pose.orientation.z(), swapped_pose.orientation.w());
+            dbg_logger.log(record{
+                pose_record,{ 
+                    {iteration_no},
+                    {double(swapped_pose.position.x())},
+                    {double(swapped_pose.position.y())},
+                    {double(swapped_pose.position.z())},
+            }});
         } else {
             ImGui::TextColored(ImVec4(1.0, 0.0, 0.0, 1.0), "Invalid fast pose pointer");
         }
@@ -178,6 +203,13 @@ public:
                         true_pose.position.z());
             ImGui::Text("Ground truth quaternion (XYZW):\n  (%f, %f, %f, %f)", true_pose.orientation.x(),
                         true_pose.orientation.y(), true_pose.orientation.z(), true_pose.orientation.w());
+            gt_logger.log(record{
+                ground_truth_record,{ 
+                    {iteration_no},
+                    {double(true_pose.position.x())},
+                    {double(true_pose.position.y())},
+                    {double(true_pose.position.z())},
+            }});
         } else {
             ImGui::TextColored(ImVec4(1.0, 0.0, 0.0, 1.0), "Invalid ground truth pose pointer");
         }
@@ -207,6 +239,7 @@ public:
         ImGui::End();
 
         ImGui::Render();
+        
 
         RAC_ERRNO_MSG("debugview after ImGui render");
     }
@@ -405,6 +438,10 @@ private:
     ObjScene headset;
 
     Eigen::Matrix4f basicProjection;
+
+    // add feedout recorder for debugview
+    record_coalescer dbg_logger;
+    record_coalescer gt_logger;
 
 public:
     /* compatibility interface */
