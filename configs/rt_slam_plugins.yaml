@@ -7,8 +7,8 @@ plugin_group:
   # - path: record_imu_cam/
   - name: Kimera-VIO/
     path:
-      git_repo: https://github.com/ILLIXR/Kimera-VIO.git
-      version: "3.3"
+      git_repo: https://github.com/seconrg/Kimera-VIO.git
+      version: "master"
   # - name: OpenVINS
   #   path:
   #     git_repo: https://github.com/ILLIXR/open_vins.git

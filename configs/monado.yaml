@@ -21,8 +21,8 @@ action:
 
   monado:
     path:
-      git_repo : https://github.com/ILLIXR/monado_integration.git
-      version  : "3.2"
+      git_repo : https://github.com/seconrg/monado_integration.git
+      version  : "master"
 
     config: # For CMake
       BUILD_WITH_LIBUDEV : "0"
@@ -36,7 +36,7 @@ action:
 
   openxr_app: !include "openxr_app.yaml"
 
-  kimera_path: .cache/paths/https%c%s%sgithub.com%sILLIXR%sKimera-VIO.git/
+  kimera_path: .cache/paths/https%c%s%sgithub.com%sseconrg%sKimera-VIO.git/
   audio_path:  .cache/paths/https%c%s%sgithub.com%sILLIXR%saudio_pipeline.git/
 
 profile: opt
