@@ -35,9 +35,18 @@ script_path="${src_dir}/miniconda.sh"
 
 
 ### Checks ###
+# echo "INSTALL ON ${arch_name}"
 
 case "${arch_name}" in
     x86_64)
+    check_cmd_conda=$(conda --version 2>/dev/null)
+        if [ "$?" -eq 0 ]; then
+            ## Conda found
+            echo "Found conda installation. Exiting installation script."
+            exit 0
+        fi
+        ;;
+    aarch64)
         check_cmd_conda=$(conda --version 2>/dev/null)
         if [ "$?" -eq 0 ]; then
             ## Conda found
